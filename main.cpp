@@ -236,6 +236,8 @@ void saveFile(const vector<char>& buffer_vec)
         else
             ofs << buffer_vec[i];
     }
+
+    ofs.close();
 }
 
 int main(int argc, char *argv[]) {
