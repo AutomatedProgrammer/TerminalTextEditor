@@ -4,12 +4,34 @@
 #include <termios.h>
 #include <cctype>
 #include <vector>
+#include <sstream>
+#include <sys/ioctl.h>
+#include <fstream>
 using namespace std;
 
 #define CTRL_KEY(k) ((k) & 0x1f) //I have no idea how to rewrite this in C++
 
 int cursorX = 0;
 int cursorY = 0;
+int screenrows = 0;
+int screencols = 0;
+
+void saveFile(const vector<char>&);
+
+int getWindowSize(int *rows, int *cols) { //Pretty much copied from buildyourowntexteditor
+    struct winsize ws;
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
+        return -1;
+    }
+    else{
+        *cols = ws.ws_col;
+        *rows = ws.ws_row;
+        return 0;
+    }
+    
+    
+}
+
 
 enum editorKey {
     BACKSPACE = 127,
@@ -120,7 +142,12 @@ void editorProcessKeypress(vector<char>& buffer_vec) {
         case CTRL_KEY('q'):
         cout.write("\x1b[2J", 4);
         cout.write("\x1b[H", 3);
+        disableRawMode();
         exit(0);
+        break;
+
+        case CTRL_KEY('s'):
+        saveFile(buffer_vec);
         break;
 
         case BACKSPACE:
@@ -129,19 +156,31 @@ void editorProcessKeypress(vector<char>& buffer_vec) {
 
         
         case ARROW_UP:
-        cursorY++;
+        if (cursorY != 0)
+        {
+            cursorY--;
+        }
         break;
 
         case ARROW_DOWN:
-        cursorY--;
+        if (cursorY != screenrows - 1)
+        {
+            cursorY++;
+        }
         break;
 
         case ARROW_LEFT:
-        cursorX--;
+        if (cursorX != 0)
+        {
+            cursorX--;
+        }
         break;
 
         case ARROW_RIGHT:
-        cursorX++;
+        if (cursorX != screencols - 1)
+        {
+            cursorX++;
+        }
         break;
         
 
@@ -152,19 +191,63 @@ void editorProcessKeypress(vector<char>& buffer_vec) {
 }
 
 void editorRefreshScreen(const vector<char>& buffer_vec) {
-    
+
+    cout.write("\x1b[?25l", 6);
     cout.write("\x1b[2J", 4);
     cout.write("\x1b[H", 3);
-
+    cout.write("\x1b[?25h", 6); 
+    
     for (int i = 0; i < buffer_vec.size(); i++) {
         cout << buffer_vec[i];
     }
+    
 }
 
-int main() {
+void openFile(string filename, vector<char>& buffer_vec)
+{
+    ifstream ifs;
+    char word;
+    ifs.open(filename);
+    while (ifs >> noskipws >> word)
+    {
+        buffer_vec.push_back(word);
+    }
+    ifs.close();
+}
+
+void saveFile(const vector<char>& buffer_vec)
+{
+    string filename;
+    cout.write("\x1b[?25l", 6);
+    cout.write("\x1b[2J", 4);
+    cout.write("\x1b[H", 3);
+    cout.write("\x1b[?25h", 6); 
+    cout << endl;
+    cout << "Save as...";
+    cin >> filename;
+
+    ofstream ofs;
+    ofs.open(filename);
+
+    for (int i = 0; i < buffer_vec.size(); i++)
+    {
+        if (buffer_vec[i] == '\r') ofs << '\r';
+        else if (buffer_vec[i] == '\n') ofs << '\n';
+        else
+            ofs << buffer_vec[i];
+    }
+}
+
+int main(int argc, char *argv[]) {
     vector<char> buffer;
     enableRawMode();
-
+    getWindowSize(&screenrows, &screencols);
+    
+    if (argc >= 2)
+    {
+        openFile(argv[1], buffer);
+    }
+    
     while (true) {
         editorRefreshScreen(buffer);
         editorProcessKeypress(buffer);
@@ -172,8 +255,3 @@ int main() {
     return 0;
 }
 
-/* Things to do
-1. Figure out how to move the cursor with arrow keys
-2. Implement saving and opening files.
-So I think we should just move the curser to a specific point in the vector before making edits somehow.
-*/
