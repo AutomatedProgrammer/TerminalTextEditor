@@ -9,6 +9,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
     int x = 0, y = 0;
+    int x_offset = 0;
     int lc = 0;
     list<int> buffer;
     list<int>::iterator it = buffer.begin(); //Viewer iterator
@@ -78,11 +79,19 @@ int main(int argc, char** argv)
         {
             //swap(*e_it, buffer.back());
             
-            if (e_it != buffer.end()) e_it = buffer.erase(e_it);
-            else if (e_it != buffer.begin())
+            //if (e_it != buffer.end()) e_it = buffer.erase(e_it);
+            if (e_it != buffer.begin() && e_it != buffer.end()) 
+            {
+                buffer.erase(e_it--);
+                //x_offset++;
+            }
+            else if (e_it == buffer.end() && e_it != buffer.begin()) 
             {
                 buffer.pop_back();
+                //x_offset++;
             }
+            
+
             x = 0;
             clear();
             for (it = buffer.begin(); it != buffer.end(); it++)
@@ -91,8 +100,8 @@ int main(int argc, char** argv)
                 printw("%c", ch);
                 x++;
             }
-            
-            //move(y,x);
+            x -= x_offset;
+            move(y,x);
             
             continue;
         }
@@ -115,6 +124,7 @@ int main(int argc, char** argv)
             if (e_it != buffer.end())
             {
                 //getsyx(y, x);
+                x_offset--;
                 x++;
                 e_it++;
                 move(y, x);
@@ -126,6 +136,7 @@ int main(int argc, char** argv)
             if (e_it != buffer.begin() && x-1 > 0)
             {
                 //getsyx(y, x);
+                x_offset++;
                 x--;
                 e_it--;
                 move(y, x);
@@ -141,7 +152,9 @@ int main(int argc, char** argv)
             ch = *it;
             printw("%c", ch);
         }
+        
         move(y,x);
+        
         
     }
     
@@ -150,5 +163,7 @@ int main(int argc, char** argv)
     return 0;
 }
 //TODO
-//Let the user move the cursor around the lines.
-//That's it.
+//Let the user move the cursor around the lines and insert and delete.
+//1. We got the insertion between lines.
+//2. Now we just need to figure out how to delete between lines.
+//3. Add in the second dimension and this project is practically done!
