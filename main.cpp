@@ -275,4 +275,4 @@ int main(int argc, char** argv)
     return 0;
 }
 //TODO
-//1. Add in the second dimension.
+//Fix bug where scrolling up and down more than once causes cursor and iterator to bug out.
