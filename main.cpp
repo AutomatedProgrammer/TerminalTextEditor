@@ -9,25 +9,57 @@ using namespace std;
 
 list<int>::iterator my_find(list<int>::iterator first, list<int>::iterator last, const int& val, int& x_pos)
 {
+    auto first_backup = first;
+    auto x_pos_backup = x_pos;
     while (first != last) 
     {
         if (*first == val) return first;
         ++first;
         ++x_pos;
     }
+    //x_pos = x_pos_backup;
     return last;
+    //return last;
 }
 
 list<int>::reverse_iterator my_rfind(list<int>::reverse_iterator first, list<int>::reverse_iterator last, const int& val, int& x_pos)
 {
+    auto first_backup = first;
+    auto x_pos_backup = x_pos;
+    bool first_newline = false;
+    int char_counter = 0;
     while (first != last) 
     {
-        if (*first == val) return first;
-        else if (*first == 10)
-        ++first;
-        //Ok have a variable that marks when it hits the /n. Have it keep iterating to the /r. Subtract to get the x pos and then have it return the /n
+        if (*first == val) {
+            if (first_newline == true)
+            {
+                advance(first, -char_counter);
+                return first;
+            }
+                
+            else
+            {
+                first_newline = true;
+                ++first;
+                --x_pos;
+            }
+                
+        }
+        if (first_newline == false)
+        {
+            ++first; 
+        }
+        else if (first_newline == true)
+        {
+            first++;
+            char_counter++;
+            x_pos++;
+        }
+        //++x_pos;
     }
+    //x_pos = x_pos_backup;
     return last;
+    //return last;
 }
 
 int main(int argc, char** argv)
@@ -80,6 +112,7 @@ int main(int argc, char** argv)
             ch = getch();
             if (ch == CTRL_KEY('q')) break;
             else {
+                max_y = 0;
                 x = 0;
                 y = 0;
                 clear();
@@ -119,15 +152,26 @@ int main(int argc, char** argv)
         {
             if (e_it != buffer.begin() && e_it != buffer.end()) 
             {
+                if (*e_it == 10)
+                {
+                    y--;
+                    max_y--;
+                }
                 buffer.erase(e_it--);
             }
             else if (e_it == buffer.end() && e_it != buffer.begin()) 
             {
+                if (*e_it == 10)
+                {
+                    y--;
+                    max_y--;
+                }
                 buffer.pop_back();
             }
 
             x = 0;
             y = 0;
+            max_y = 0;
             clear();
             for (it = buffer.begin(); it != buffer.end(); it++)
             {
@@ -150,17 +194,11 @@ int main(int argc, char** argv)
         {
             if (y > 0)
             {
-                //x = 0;
-                //re_it = my_rfind(re_it, buffer.rend(), 10, x);
-                re_it = find(re_it, buffer.rend(), 10);
+                x = 0;
+                re_it = my_rfind(re_it, buffer.rend(), 10, x);
+                //re_it = find(re_it, buffer.rend(), 10);
                 re_it++;
                 e_it = re_it.base();
-                /*
-                if (*e_it != 10)
-                {
-                    continue;
-                }
-                */
                 
                 while (*e_it != 10 && e_it != buffer.end())
                 {
@@ -177,15 +215,8 @@ int main(int argc, char** argv)
             if (y < max_y)
             {
                 x = 0;
-                
                 e_it = my_find(e_it, buffer.end(), 10, x);
                 e_it++;
-                /*
-                if (*e_it != 10)
-                {
-                    continue;
-                }
-                */
                 while (*e_it != 10 && e_it != buffer.end())
                 {
                     e_it++;
