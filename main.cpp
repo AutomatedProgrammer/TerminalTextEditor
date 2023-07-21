@@ -67,7 +67,7 @@ list<int>::reverse_iterator my_rfind(list<int>::reverse_iterator first, list<int
 
 int main(int argc, char** argv)
 {
-    int x = 0, y = 0, max_y = 0;
+    int x = 0, y = 0, max_y = 0, cur_y = 0, cur_x = 0;
     int x_offset = 0;
     list<int> buffer;
     list<int>::iterator it = buffer.begin(); //Viewer iterator
@@ -172,23 +172,29 @@ int main(int argc, char** argv)
                 buffer.pop_back();
             }
 
+            cur_y = y;
+            cur_x = x;
             x = 0;
             y = 0;
             max_y = 0;
+            
             clear();
             for (it = buffer.begin(); it != buffer.end(); it++)
             {
                 ch = *it;
-                printw("%c", ch);
-                x++;
-                if (ch == 10)
+                if (ch == 10 && y < cur_y)
                 {
                     y++;
-                    max_y++;
-                    x = 0;
+                    x = 0; 
                 }
+                max_y++;
+                if (x < cur_x){
+                    x++;
+                }
+                printw("%c", ch);        
             }
-            x -= x_offset;
+            x--;
+            //x -= x_offset;
             move(y,x);
             
             continue;
@@ -198,6 +204,7 @@ int main(int argc, char** argv)
             if (y > 0)
             {
                 x = 0;
+                x_offset = 0;
                 //Reverse iterator code
                 
                 re_it = my_rfind(re_it, buffer.rend(), 10, x);
@@ -221,6 +228,7 @@ int main(int argc, char** argv)
         {
             if (y < max_y)
             {
+                x_offset = 0;
                 x = 0;
                 e_it = my_find(e_it, buffer.end(), re_it, 10, x);
                 
@@ -285,5 +293,3 @@ int main(int argc, char** argv)
     endwin();
     return 0;
 }
-//TODO
-//Fix cursor positioning when deleting characters in the middle of lines.
