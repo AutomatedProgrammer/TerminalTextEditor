@@ -207,9 +207,9 @@ int main(int argc, char** argv)
                 //e_it++;
                 while (*e_it != 10 && e_it != buffer.end())
                 {
-                    break;
+                    re_it--;
                     e_it++;
-                    
+                    //x++;
                 }
                 
                 y--;
