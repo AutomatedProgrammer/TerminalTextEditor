@@ -7,13 +7,14 @@ using namespace std;
 
 #define CTRL_KEY(k) ((k) & 0x1f) //Control key
 
-list<int>::iterator my_find(list<int>::iterator first, list<int>::iterator last, const int& val, int& x_pos)
+list<int>::iterator my_find(list<int>::iterator first, list<int>::iterator last, list<int>::reverse_iterator& re_it, const int& val, int& x_pos)
 {
     auto first_backup = first;
     auto x_pos_backup = x_pos;
     while (first != last) 
     {
         if (*first == val) return first;
+        --re_it;
         ++first;
         ++x_pos;
     }
@@ -36,14 +37,12 @@ list<int>::reverse_iterator my_rfind(list<int>::reverse_iterator first, list<int
                 advance(first, -char_counter);
                 return first;
             }
-                
             else
             {
                 first_newline = true;
                 ++first;
-                --x_pos;
+                //--x_pos;
             }
-                
         }
         if (first_newline == false)
         {
@@ -57,8 +56,12 @@ list<int>::reverse_iterator my_rfind(list<int>::reverse_iterator first, list<int
         }
         //++x_pos;
     }
+    if (first == last)
+    {
+        return last;
+    }
     //x_pos = x_pos_backup;
-    return last;
+    //return last;
     //return last;
 }
 
@@ -195,16 +198,20 @@ int main(int argc, char** argv)
             if (y > 0)
             {
                 x = 0;
-                re_it = my_rfind(re_it, buffer.rend(), 10, x);
-                //re_it = find(re_it, buffer.rend(), 10);
-                re_it++;
-                e_it = re_it.base();
+                //Reverse iterator code
                 
+                re_it = my_rfind(re_it, buffer.rend(), 10, x);
+                e_it = re_it.base();
+
+                //e_it = my_rfind(e_it, buffer.begin(), 10, x);
+                //e_it++;
                 while (*e_it != 10 && e_it != buffer.end())
                 {
+                    break;
                     e_it++;
-                    x++;
+                    
                 }
+                
                 y--;
                 move(y, x);
             }
@@ -215,13 +222,17 @@ int main(int argc, char** argv)
             if (y < max_y)
             {
                 x = 0;
-                e_it = my_find(e_it, buffer.end(), 10, x);
+                e_it = my_find(e_it, buffer.end(), re_it, 10, x);
+                
                 e_it++;
+                re_it--;
                 while (*e_it != 10 && e_it != buffer.end())
                 {
                     e_it++;
+                    re_it--;
                     x++;
                 }
+                
                 y++;
                 move(y, x);
             }
@@ -229,7 +240,7 @@ int main(int argc, char** argv)
         }
         else if (ch == KEY_RIGHT)
         {
-            if (e_it != buffer.end())
+            if (e_it != buffer.end() && *e_it != 10)
             {
                 x_offset--;
                 x++;
@@ -275,4 +286,4 @@ int main(int argc, char** argv)
     return 0;
 }
 //TODO
-//Fix bug where scrolling up and down more than once causes cursor and iterator to bug out.
+//1. Add in the second dimension.
