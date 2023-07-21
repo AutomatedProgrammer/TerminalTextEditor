@@ -286,4 +286,4 @@ int main(int argc, char** argv)
     return 0;
 }
 //TODO
-//1. Add in the second dimension.
+//Fix cursor positioning when deleting characters in the middle of lines.
