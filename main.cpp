@@ -209,8 +209,8 @@ int main(int argc, char** argv)
                 
                 re_it = my_rfind(re_it, buffer.rend(), 10, x);
                 e_it = re_it.base();
-                e_it++;
-                re_it--;
+                //e_it++;
+                //re_it--;
 
                 //e_it = my_rfind(e_it, buffer.begin(), 10, x);
                 //e_it++;
