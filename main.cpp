@@ -78,7 +78,7 @@ int main(int argc, char** argv)
     ifstream ifs;
     ofstream ofs;
     //ifs.open(argv[1]);
-    ifs.open("Test.txt");
+    ifs.open(argv[1]);
     while (ifs >> noskipws >> cch)
     {
         ch = static_cast<int>(cch);
@@ -138,8 +138,7 @@ int main(int argc, char** argv)
         }
         else if (ch == CTRL_KEY('s'))
         {
-            //ofs.open(argv[1]);
-            ofs.open("Test.txt");
+            ofs.open(argv[1]);
             for (it = buffer.begin(); it != buffer.end(); it++)
             {
                 cch = static_cast<char>(*it);
@@ -203,12 +202,15 @@ int main(int argc, char** argv)
         {
             if (y > 0)
             {
+                
                 x = 0;
                 x_offset = 0;
                 //Reverse iterator code
                 
                 re_it = my_rfind(re_it, buffer.rend(), 10, x);
                 e_it = re_it.base();
+                e_it++;
+                re_it--;
 
                 //e_it = my_rfind(e_it, buffer.begin(), 10, x);
                 //e_it++;
@@ -226,8 +228,9 @@ int main(int argc, char** argv)
         }
         else if (ch == KEY_DOWN)
         {
-            if (y < max_y)
+            if (y < max_y && e_it != buffer.end())
             {
+               
                 x_offset = 0;
                 x = 0;
                 e_it = my_find(e_it, buffer.end(), re_it, 10, x);
